@@ -7,159 +7,15 @@ March, 2012
 import os
 from mypy.datautil import datadir
 from numpy import *
+from pandas import *
 
 BASEDIR = "%s/exp-mturk/shift-prior-v1" % datadir()
 
-SUBJECTS = [523, 524, 525, 526]
+SUBJECTS = [523, 524, 525, 526, 527, 528, 529, 532, 533, 534, 538, 541, 542, 544, 545, 547, 548, 549, 551, 552, 553, 554, 555, 556, 557, 558, 559, 560, 561, 562, 563, 564, 565, 566, 567, 568, 575, 576, 578, 579, 584, 585, 586, 587, 589, 591, 678, 679, 680, 681, 682, 683, 684, 685, 686, 687, 688, 689, 690, 691, 692, 693, 694, 695, 696, 697, 699, 701, 702, 703, 704, 705, 706, 707, 708, 709, 710, 711, 712, 713, 714]
 
 N_BLOCKS = 2
 N_GAMES_PER_BLOCK = 12
 BIASTYPES = ["unbiased","long","thin","sameshape"]
-
-BIASBLOCK = {
-             523: [0, 3],
-             524: [0, 2],
-             525: [1, 0],
-             526: [0, 2],
-             527: [3, 0], # sampler - usq done, need to copy
-             528: [3, 0], # sampler - usq done, need to copy
-             529: [0, 1], # sampler - usq done, need to copy
-             532: [1, 0], # sampler - usq done, need to copy
-             533: [0, 3], # sampler - usq done, need to copy
-             534: [0, 2], # sampler - usq done, need to copy
-             538: [1, 0], # sampler - usq done, need to copy
-             541: [0, 2], # sampler - usq done, need to copy
-             542: [1, 0], # sampler - usq dne, need to copy
-             544: [3, 0], # sampler - usq Q
-             545: [0, 3], # sampler - usq done, need to copy
-             547: [0, 3], # sampler - usq done, need to copy
-             548: [0, 2], # sampler - usq done, need to copy
-             549: [0, 3], # sampler - usq done, need to copy
-             551: [2, 0], # sampler - usq done, need to copy
-             552: [0, 1], # sampler - usq done, need to copy
-             553: [3, 0], 
-             554: [3, 0], # done
-             555: [1, 0], # done
-             556: [0, 2], # done
-             557: [2, 0], # done
-             558: [1, 0], # done
-             559: [0, 3], # done 
-             560: [0, 2], # done
-             561: [1, 0], # done
-             562: [1, 0], # done
-             563: [0, 2], # done
-             564: [0, 3], # done
-             565: [2, 0], # done
-             566: [3, 0], # done
-             567: [0, 1], # done
-             568: [0, 1], # done
-             575: [0, 1], # done
-             576: [3, 0], # done
-             578: [0, 1], # done
-             579: [3, 0], # done
-             584: [2, 0], # done
-             585: [3, 0], # done
-             586: [2, 0], # done
-             587: [0, 1], # done
-             589: [0, 2], # done
-             591: [0, 3], # done
-            }
-
-GAMESPLAYED = {
-               (523,0): range(N_GAMES_PER_BLOCK),
-               (523,1): range(N_GAMES_PER_BLOCK),    
-               (524,0): range(N_GAMES_PER_BLOCK),
-               (524,1): range(N_GAMES_PER_BLOCK),
-               (525,0): range(N_GAMES_PER_BLOCK),
-               (525,1): range(N_GAMES_PER_BLOCK),    
-               (526,0): range(N_GAMES_PER_BLOCK),
-               (526,1): range(N_GAMES_PER_BLOCK),  
-               (527,0): range(N_GAMES_PER_BLOCK),
-               (527,1): range(N_GAMES_PER_BLOCK),    
-               (528,0): range(N_GAMES_PER_BLOCK),
-               (528,1): range(N_GAMES_PER_BLOCK),    
-               (529,0): range(N_GAMES_PER_BLOCK),
-               (529,1): range(N_GAMES_PER_BLOCK),    
-               (532,0): range(N_GAMES_PER_BLOCK),
-               (532,1): range(N_GAMES_PER_BLOCK),    
-               (533,0): [0,1,2,3,4,5,7,8,9,10,11],
-               (533,1): [0,1,2,3,5,6,7,8,9,10,11],    
-               (534,0): range(N_GAMES_PER_BLOCK),
-               (534,1): range(N_GAMES_PER_BLOCK),    
-               (538,0): [0,1,2,3,4,5,7,8,9,11],
-               (538,1): range(N_GAMES_PER_BLOCK),
-               (541,0): range(N_GAMES_PER_BLOCK),
-               (541,1): range(N_GAMES_PER_BLOCK),
-               (542,0): [0,2,3,4,5,6,7,8,9,10,11],
-               (542,1): range(N_GAMES_PER_BLOCK),
-               (544,0): range(N_GAMES_PER_BLOCK),
-               (544,1): range(N_GAMES_PER_BLOCK),
-               (545,0): range(N_GAMES_PER_BLOCK),
-               (545,1): range(N_GAMES_PER_BLOCK),
-               (547,0): range(N_GAMES_PER_BLOCK),
-               (547,1): range(N_GAMES_PER_BLOCK),
-               (548,0): range(N_GAMES_PER_BLOCK),
-               (548,1): range(N_GAMES_PER_BLOCK),
-               (549,0): range(N_GAMES_PER_BLOCK),
-               (549,1): range(N_GAMES_PER_BLOCK),
-               (551,0): range(N_GAMES_PER_BLOCK),
-               (551,1): range(N_GAMES_PER_BLOCK),
-               (552,0): range(N_GAMES_PER_BLOCK),
-               (552,1): range(N_GAMES_PER_BLOCK),
-               (553,0): range(N_GAMES_PER_BLOCK),
-               (553,1): range(N_GAMES_PER_BLOCK),
-               (554,0): range(N_GAMES_PER_BLOCK),
-               (554,1): range(N_GAMES_PER_BLOCK),
-               (555,0): [0,1,2,3,4,5,6,7,8,11],
-               (555,1): range(N_GAMES_PER_BLOCK),
-               (556,0): range(N_GAMES_PER_BLOCK),
-               (556,1): range(N_GAMES_PER_BLOCK),
-               (557,0): [0,1,2,3,4,5,6,7,9,10,11],
-               (557,1): range(N_GAMES_PER_BLOCK),
-               (558,0): [0,2,3,4,5,6,7,9,10,11],
-               (558,1): [0,1,2,3,4,5,7,8,9,10,11],
-               (559,0): range(N_GAMES_PER_BLOCK),
-               (559,1): range(N_GAMES_PER_BLOCK),
-               (560,0): [0,1,2,3,4,5,6,7,9],
-               (560,1): [0,1,4,5,7,10,11],
-               (561,0): range(N_GAMES_PER_BLOCK),
-               (561,1): [0,1,2,3,4,5,6,7,8,9,10],
-               (562,0): range(N_GAMES_PER_BLOCK),
-               (562,1): range(N_GAMES_PER_BLOCK),
-               (563,0): range(N_GAMES_PER_BLOCK),
-               (563,1): range(N_GAMES_PER_BLOCK),
-               (564,0): range(N_GAMES_PER_BLOCK),
-               (564,1): range(N_GAMES_PER_BLOCK),
-               (565,0): range(N_GAMES_PER_BLOCK),
-               (565,1): [0,1,3,4,5,6,7,8,9,10,11],
-               (566,0): [0,1,2,3,5,7,8,9,10,11],
-               (566,1): [0,1,3,4,5,6,7,8,9,10,11],
-               (567,0): range(N_GAMES_PER_BLOCK),
-               (567,1): range(N_GAMES_PER_BLOCK),
-               (568,0): range(N_GAMES_PER_BLOCK),
-               (568,1): range(N_GAMES_PER_BLOCK),
-               (575,0): range(N_GAMES_PER_BLOCK),
-               (575,1): range(N_GAMES_PER_BLOCK),
-               (576,0): range(N_GAMES_PER_BLOCK),
-               (576,1): range(N_GAMES_PER_BLOCK),
-               (578,0): range(N_GAMES_PER_BLOCK),
-               (578,1): range(N_GAMES_PER_BLOCK),
-               (579,0): range(N_GAMES_PER_BLOCK),
-               (579,1): range(N_GAMES_PER_BLOCK),
-               (584,0): range(N_GAMES_PER_BLOCK),
-               (584,1): range(N_GAMES_PER_BLOCK),
-               (585,0): range(N_GAMES_PER_BLOCK),
-               (585,1): range(N_GAMES_PER_BLOCK),
-               (586,0): [0,1,2,3,4,5,6,7,9,10,11],
-               (586,1): [0,2,3,4,5,6,7,9,10],
-               (587,0): range(N_GAMES_PER_BLOCK),
-               (587,1): range(N_GAMES_PER_BLOCK),
-               (589,0): range(N_GAMES_PER_BLOCK),
-               (589,1): [0,1,3,4,5,6,7,8,9,10,11],
-               (591,0): range(N_GAMES_PER_BLOCK),
-               (591,1): range(N_GAMES_PER_BLOCK),
-              }
-
 
 UNBIASED_BOARDS = [
     [523,0],
@@ -219,48 +75,70 @@ def setdatadir(dir):
     global BASEDIR
     BASEDIR = dir
 
-def loadgameboard(subj=None, block=None, game=None):
+def loaddata(subj=None):
     spath = '%s/%s.dat' % (BASEDIR,subj)
     if not os.path.exists(spath):
         print "no data file found!"
         return None
     else:
-        print "loading gameboard from %s" % spath
+        #print "loading game data from %s" % spath        
         fp = open(spath, 'r')
-        lines = filter(lambda l: len(l)>3,[ line.rstrip('\n').split(' ') for line in fp.readlines()])
-
-        lines = filter(lambda s: s[1]==str(block) and s[2]==str(game) and s[3]=='gameboard', lines)
+        lines = [l.rstrip('\n') for l in fp.readlines()]
         fp.close()
+        return lines
 
+def getcondition(subj):
+    data = loaddata(subj)
+    condition = filter(lambda line: len(line)>=2 and (line[0]=="condition:" or line[1]=="condition"), [l.split(' ') for l in data])[0]
+    counter =  filter(lambda line: len(line)>=2 and (line[0]=="countercond:" or line[1]=="countercond"), [l.split(' ') for l in data])[0]
+
+    # fixing a difference in output for some subjects
+    if len(condition)==2:   
+        condition = int(condition[1])
+        counter =   int(counter[1])
+    else:                   
+        condition = int(condition[2])
+        counter =   int(counter[2])
+
+    return [condition, counter]
+
+def loadgameboard(subj=None, block=None, game=None):
+    data = loaddata(subj=subj)
+    if data==None: return None
+    else:
+        lines = filter(lambda l: len(l)>3,[ line.rstrip('\n').split(' ') for line in data])
+        lines = filter(lambda s: s[1]==str(block) and s[2]==str(game) and s[3]=='gameboard', lines)
         return map(int,lines[0][4:])
 
-
 def loadsamples(subj=None, block=None, game=None):
-    spath = '%s/%s.dat' % (BASEDIR,subj)
-    if not os.path.exists(spath):
-        print "no samples found!"
-        return None
+    data = loaddata(subj=subj)
+    if data==None: return None
     else:
-        print "loading samples from %s" % spath
-        fp = open(spath, 'r')
-
-        lines = filter(lambda l: len(l)>3,[ line.rstrip('\n').split(' ') for line in fp.readlines()])
-
+        lines = filter(lambda l: len(l)>3,[ line.rstrip('\n').split(' ') for line in data])
         lines = filter(lambda s: s[1]==str(block) and s[2]==str(game) and s[3]=='sample', lines)
-        fp.close()
 
         samples = [[int(s) for s in line[4:7]] for line in lines]
         X = [[toindex(s[0:2],10), s[2]] for s in samples]
         return X
 
-def gamesplayed(subj=None, block=None): return GAMESPLAYED[(subj,block)]
+def gamesplayed(subj=None, block=None):
+    return list(where([len(loadsamples(subj=subj, block=block, game=g)) for g in range(N_GAMES_PER_BLOCK)])[0])
 
-def biastype(subj=None, block=None): return BIASTYPES[ BIASBLOCK[subj][block] ]
+def biastype(subj=None, block=None):
+    cond, counter = getcondition(subj)
+    if block==0:
+        if counter==0:  return BIASTYPES[0]
+        else:           return BIASTYPES[cond+1]
+    else:
+        if counter==0:  return BIASTYPES[cond+1]
+        else:           return BIASTYPES[0]
 
 def biasblock(subj=None, bias="unbiased"):
-    bind = BIASTYPES.index(bias)
-    return BIASBLOCK[subj].index(bind)
-
+    biases = [biastype(subj=subj, block=b) for b in [0,1]]
+    if bias in biases:
+        return biases.index(bias)
+    else:
+        return None
 
 def topairs(n, ncells):
     """Convert from linear index to coordinate"""
@@ -275,3 +153,28 @@ def toindex(pair, ncells):
 def getDataGrid(x,y):
     return [[(j,i) for i in range(0,y)] for j in range(0,x)]
 
+if __name__=="__main__":
+    #subj = 560
+    #print biastype(subj=subj, block=0)
+    #print biastype(subj=subj, block=1)
+    #print gamesplayed(subj=subj, block=0)
+    #print biasblock(subj=subj, bias="unbiased")
+    #print biasblock(subj=subj, bias="long")
+    #print biasblock(subj=subj, bias="thin")
+    #print biasblock(subj=subj, bias="sameshape")
+    
+    # get a summary of all subjects
+    d = []
+    for subj in SUBJECTS:
+        cond, counter = getcondition(subj)
+        skipped0, skipped1 = [N_GAMES_PER_BLOCK-len(gamesplayed(subj=subj, block=b)) for b in [0,1]]
+
+        d.append([subj,cond,counter,skipped0,skipped1])
+
+    df = DataFrame.from_records(d, columns=['subj','cond','counter','skipped0','skipped1']
+                               
+                               )
+
+    cond = df[df['counter']==1]['cond']
+    print [ list(cond).count(i) for i in range(3) ]
+    
