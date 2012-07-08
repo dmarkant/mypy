@@ -177,11 +177,14 @@ def simpool(sim, nprocesses=2):
 
     print "farming sim for %s runs" % nruns
     pool = Pool(processes=nprocesses)
-
-    print nruns
-
     pool.map(runsim, range(nruns))
 
+
+class Model:
+
+    def __init__(self, args):
+        self.quiet = args.get('quiet',False)
+        self.loglh = None
 
 
 class Sim:
@@ -284,7 +287,7 @@ class Sim:
         else:
             f = "%s/output-run%s.dat.gz" % (self.outdir, rind)
 
-        print "\twriting result"
+        #if not self.quiet: print "\twriting result to %s" % self.outdir
         fp = gzip.open(f, "w")
         fp.writelines(data)
         fp.flush()

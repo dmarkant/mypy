@@ -11,7 +11,7 @@ from pandas import *
 
 BASEDIR = "%s/exp-mturk/shift-prior-v1" % datadir()
 
-SUBJECTS = [523, 524, 525, 526, 527, 528, 529, 532, 533, 534, 538, 541, 542, 544, 545, 547, 548, 549, 551, 552, 553, 554, 555, 556, 557, 558, 559, 560, 561, 562, 563, 564, 565, 566, 567, 568, 575, 576, 578, 579, 584, 585, 586, 587, 589, 591, 678, 679, 680, 681, 682, 683, 684, 685, 686, 687, 688, 689, 690, 691, 692, 693, 694, 695, 696, 697, 699, 701, 702, 703, 704, 705, 706, 707, 708, 709, 710, 711, 712, 713, 714]
+SUBJECTS = [523, 524, 525, 526, 527, 528, 529, 532, 533, 534, 538, 541, 542, 544, 545, 547, 548, 549, 551, 552, 553, 554, 555, 556, 557, 558, 559, 560, 561, 562, 563, 564, 565, 566, 567, 568, 575, 576, 578, 579, 584, 585, 586, 587, 589, 591, 678, 679, 680, 681, 682, 683, 684, 685, 686, 687, 688, 689, 690, 691, 692, 693, 694, 695, 696, 697, 699, 701, 702, 703, 704, 705, 706, 707, 708, 709, 710, 711, 712, 713, 714, 716, 717, 718]
 
 N_BLOCKS = 2
 N_GAMES_PER_BLOCK = 12
@@ -154,10 +154,10 @@ def getDataGrid(x,y):
     return [[(j,i) for i in range(0,y)] for j in range(0,x)]
 
 if __name__=="__main__":
-    #subj = 560
+    subj = 586
     #print biastype(subj=subj, block=0)
     #print biastype(subj=subj, block=1)
-    #print gamesplayed(subj=subj, block=0)
+    #print gamesplayed(subj=subj, block=1)
     #print biasblock(subj=subj, bias="unbiased")
     #print biasblock(subj=subj, bias="long")
     #print biasblock(subj=subj, bias="thin")
@@ -171,9 +171,7 @@ if __name__=="__main__":
 
         d.append([subj,cond,counter,skipped0,skipped1])
 
-    df = DataFrame.from_records(d, columns=['subj','cond','counter','skipped0','skipped1']
-                               
-                               )
+    df = DataFrame.from_records(d, columns=['subj','cond','counter','skipped0','skipped1'])
 
     cond = df[df['counter']==1]['cond']
     print [ list(cond).count(i) for i in range(3) ]

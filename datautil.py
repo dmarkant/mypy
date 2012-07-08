@@ -3,9 +3,8 @@ import string, os
 from shutil import copy
 from inspect import getfile
 from socket import gethostname
-from numpy import array, cumsum, arange
+from numpy import array, cumsum
 from random import random
-import multiprocessing
 """
 Generic functions for reading and writing data
 """
@@ -54,7 +53,18 @@ def checkpath(dir):
 
     if head!="" and head!="~" and not os.path.exists(head): checkpath(head)
     if not os.path.exists(dir): os.mkdir(dir)
- 
+
+def simplebackup(filename):
+    if os.path.exists(filename):
+        i = 1
+        backup = filename+".bak%s" % i
+        while os.path.exists(filename+".bak%s" % i):
+            i += 1
+        backup = filename+".bak%s" % i
+        print "datafile exists... backing up to "+backup
+        os.rename(filename, backup)
+    return
+    
 
 ##########################################
 # Frequent operations on data
@@ -85,6 +95,20 @@ def outformat2d(list, name, outputprefix=""):
         for entry in list[i]:
             s += "%s " % entry
         s += "\n"
+    return s
+
+def outformatpar(pairs):
+    """Take a dict of {parameter:value} pairs and format for output file"""
+    s = ""
+    for k in sort(pairs.keys()):
+        s += "%s" % k
+        if isinstance(pairs[k], list):
+            for val in pairs[k]:
+                s += " %s" % val
+            s += "\n"
+        else:
+            s += " %s\n" % pairs[k]
+
     return s
 
 def out2d(list, sep=" "):
