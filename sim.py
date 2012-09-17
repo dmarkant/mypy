@@ -11,7 +11,9 @@ from datautil import checkpath, copyclasshier
 from datetime import datetime
 from multiprocessing import Pool
 from copy import copy
-from scipy.optimize import fmin
+from scipy.optimize import fmin, fmin_bfgs
+from numpy import around
+import sqlite3
 
 HOST = gethostname()
 
@@ -185,6 +187,78 @@ class Model:
     def __init__(self, args):
         self.quiet = args.get('quiet',False)
         self.loglh = None
+        self.optfunc = args.get('optfunc',None)
+        if self.optfunc is 'llh':
+            self.opt = self.llh
+        elif self.optfunc is 'rmse':
+            self.opt = self.rmse
+
+    def llh(self):
+        pass
+
+    def rmse(self):
+        pass
+
+
+class SimDB:
+
+    def __init__(self, args):
+        self.file = args.get('db_file',None)
+        self.fields = args.get('fields',None)
+
+    def get_connection(self): return sqlite3.connect(self.file)
+    
+    def add_table(self, tablename=None, fields=None):
+
+        q = "CREATE TABLE %s ( sim_id int PRIMARY_KEY NOT_NULL AUTO_INCREMENT" % tablename
+        for f in fields:
+            q += ", %s %s" % (f[0], f[1])
+        q += ", PRIMARY KEY (sim_id))"
+
+        with self.get_connection() as conn:
+            r = conn.cursor().execute(q)
+            conn.commit()
+    
+    def add_column(self, tablename=None, colname=None, datatype=None):
+
+        q = "ALTER TABLE %s ADD %s %s" % (tablename, colname, datatype)
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(q)
+            err = conn.commit()
+
+
+    def drop_table(self, tablename):
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""DROP TABLE %s""" % (tablename))
+            err = conn.commit()
+
+
+    def update_result(self, tablename, fields, record):
+
+        fields = [f[0] for f in fields]
+        q = "INSERT INTO %s ( %s ) VALUES ( %s )" % (tablename, ', '.join(fields), ', '.join(map(str,record)))
+
+        with self.get_connection() as conn:
+            conn.cursor().execute(q)
+            err = conn.commit()
+
+    def result_exists(self, tablename, pars):
+        f = pars.keys()
+        q = "SELECT * FROM %s WHERE %s=%s" % (tablename, f[0], pars[f[0]])
+        for k in f[1:]:
+            q += " AND %s=%s" % (k, pars[k])
+
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            r = cursor.execute(q)
+            num_results = len(cursor.fetchall())
+
+        if num_results > 0:
+            return True
+        else:
+            return False
 
 
 class Sim:
@@ -200,7 +274,9 @@ class Sim:
         self.init = args.get('init',{})             # dict of {param: value} pairs used to initialize the model
         self.fixed = args.get('fixed',{})           # dict of {param: value} pairs that are fixed during simulation
         self.par = args.get('par',{})               # dict of {param: value} pairs that are free parameters to be fit
-        
+        self.save = args.get('save',True)           # whether to save result
+        self.compress = args.get('compress',True)   # whether to gzip output
+
         self.nruns = args.get('nruns',1) 
         self.run_indices = args.get('run_indices',range(self.nruns))
 
@@ -231,6 +307,7 @@ class Sim:
             if not self.quiet: print "No free parameters, running model for %s runs..." % self.nruns
             
             for r in range(self.nruns):
+
                 rind = self.run_indices[r]
 
                 if "llh" in dir(m):
@@ -242,7 +319,7 @@ class Sim:
                     m(self.fixed, output=False)        
                 
                 sys.stdout.flush()
-                self.output( m.output(), rind=rind) # write model output to file
+                if self.save: self.output( m.output(), rind=rind) # write model output to file
 
         else:
             if not self.quiet: print "Found free parameters, fitting model %s times..." % self.nruns
@@ -261,7 +338,11 @@ class Sim:
             bmin, bmax = self.par[p]
 
             # init value should be randomly chosen in between the min and max values
-            init_p = bmin + random()*(bmax-bmin)
+            init_p = around( bmin + random()*(bmax-bmin) , 2)
+
+            #!!
+            init_p = round( bmin + 0.5*(bmax-bmin), 2)
+            #!!
             init.append(init_p)
             print "|\t%s: init=%s, min=%s, max=%s" % (p, init_p, bmin, bmax)
 
@@ -276,19 +357,28 @@ class Sim:
                 "dir":self.outdir,
                 "runindex":run
                }
-        [f, fopt, iter, funcalls, warnflag] = fmin( model.llh, init, args=[args], xtol=.1, ftol=.1, maxiter=100, full_output=1 )
+
+        [f, fopt, iter, funcalls, warnflag] = fmin( model.opt, init, args=[args], xtol=.05, ftol=.01, maxiter=100, full_output=1 )
+
+        #[f, fopt, iter, funcalls, warnflag] = fmin_bfgs( model.opt, init, args=[args], epsilon=.01, maxiter=100, full_output=1 )
+        
         print "| %s iterations" % iter
 
-        llh = model.llh(f, args)
-        self.outputfit( model, init, f, fopt, iter, run, llh )
+        e_opt = model.opt(f, args)
+        self.outputfit( model, init, f, fopt, iter, run, e_opt )
+
     def output(self, data, rind=None):
         if rind is None:
-            f = "%s/output.dat.gz" % self.outdir
+            f = "%s/output.dat" % self.outdir
         else:
-            f = "%s/output-run%s.dat.gz" % (self.outdir, rind)
+            f = "%s/output-run%s.dat" % (self.outdir, rind)
 
         #if not self.quiet: print "\twriting result to %s" % self.outdir
-        fp = gzip.open(f, "w")
+        if self.compress:   
+            fp = gzip.open(f, "w")
+            f = "%s.gz" % f
+        else:               
+            fp = open(f, "w")
         fp.writelines(data)
         fp.flush()
         fp.close()
@@ -308,6 +398,8 @@ class Sim:
         else:
             fp = open("%s/fit_output.dat" % self.outdir, "aw")
             s = ""
+
+
 
         # write results of fitting
         for i in range(len(self.par)):

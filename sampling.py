@@ -30,13 +30,32 @@ def pairwisemargin(l):
     pwlm = map(lambda pair: sum(pair)*(1-(pair[1]-pair[0])), [sort([l[0]/t, l[1]/t]), sort([l[0]/t, l[2]/t]), sort([l[1]/t, l[2]/t])])
     return pwlm
 
-def probchoice(V, d):
+def probchoice(V, d, obs=[]):
     """Make probabiilistic choice based on array of sampling values V and determinism d
     
        Returns index of choice (not actual sample, which is tied to a sampling set)
     """
-    top = [exp(d*v) for v in V]
+    
+    #d = 0.01
+    #obs = []
+    #V = array([0., 0., 0.2, 0.2, 0.2, 0.4])
+
+    #top = [exp(d*v) for v in V]
+    top = exp(V * (1./d))
+
+    #print top
+    #print dummy
+
+    # set the value of any prior observations to zero
+    for i in range(len(obs)): top[obs[i][0]] = 0.
+   
     bottom = sum(top)
     cp = [t/bottom for t in top]
-    return sum(1*(random() < cumsum(cp)))-1
+    
+    r = random()
+    #print r
+    #print cumsum(cp)
 
+    return where((1*(r < cumsum(cp)))==1)[0][0]
+
+    #return sum(1*(random() < cumsum(cp)))-1

@@ -6,7 +6,7 @@ from socket import gethostname
 from numpy import array, cumsum
 from random import random
 """
-Generic functions for reading and writing data
+Generic functions for working with data
 """
 
 ##########################################
