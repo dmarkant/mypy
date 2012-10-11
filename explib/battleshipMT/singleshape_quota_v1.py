@@ -10,6 +10,7 @@ from mypy.datautil import datadir
 from numpy import *
 from pandas import *
 
+
 BASEDIR = "%s/exp-mturk/single-shape-quota-v1" % datadir()
 
 HSPACE_NAMES = [ "A", "K", "N", "V", "U", "M", "C", "P" ];
