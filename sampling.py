@@ -9,7 +9,7 @@ from random import random
 
 def entropy(dist):
     """Entropy of discrete probability distribution"""
-    dist = array([max(d,10e-100) for d in dist])
+    dist = array([max(d,1e-100) for d in dist])
     return dot(dist,(log(1.0/dist) * (1.0/log(2.0))).T)
 
 def margin(l):

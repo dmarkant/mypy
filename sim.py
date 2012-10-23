@@ -193,9 +193,6 @@ class Model:
         elif self.optfunc is 'rmse':
             self.opt = self.rmse
 
-    def llh(self):
-        pass
-
     def rmse(self):
         pass
 
@@ -375,8 +372,7 @@ class Sim:
 
         #if not self.quiet: print "\twriting result to %s" % self.outdir
         if self.compress:   
-            fp = gzip.open(f, "w")
-            f = "%s.gz" % f
+            fp = gzip.open("%s.gz" % f, "w")
         else:               
             fp = open(f, "w")
         fp.writelines(data)

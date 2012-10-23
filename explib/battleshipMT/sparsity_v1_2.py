@@ -15,6 +15,17 @@ SUBJECTS = [28, 30, 31, 32, 33, 34, 35, 36, 37, 38]
 DATA = {}
 GAMEDATA = {}
 
+N_GAMES = 32
+N_TRIALS_PER_GAME = 4
+N_BLOCKS = 2
+
+MAX_RADIUS = 200.
+
+RADII = [0.414125584817,
+         0.585662018574,
+         0.754983443527,
+         0.894427191]
+
 #------------------------------ 
 # LOAD DATA
 #------------------------------ 
@@ -76,7 +87,6 @@ def gamedata(subj, game):
                              "response":response}
 
     return GAMEDATA[(subj,game)]
-
 
 def samples(subj, game): 
     if (subj,game) in GAMEDATA:
