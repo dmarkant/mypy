@@ -36,6 +36,8 @@ II_P = 5
 II_Y1 = 6
 II_Y2 = 7
 
+CONDITIONS = [RB_A,RB_P,RB_Y1,RB_Y2,II_A,II_P,II_Y1,II_Y2]
+
 # trial types
 TRAINTRIAL = 1
 TESTTRIAL = 2

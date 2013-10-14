@@ -146,6 +146,12 @@ def writematrix(data, filename):
     fp.flush()
     fp.close()
 
+def topairs(n, ncells):
+    """Convert from linear index to coordinate"""
+    a = int(n/int(ncells))
+    b = n - a*ncells
+    return (a,b)
+
 
 ##########################################
 # Logging and communiques
