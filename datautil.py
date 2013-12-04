@@ -9,6 +9,8 @@ from random import random
 Generic functions for working with data
 """
 
+DATADIR = None
+
 ##########################################
 # Sys and file management 
 ##########################################
@@ -22,20 +24,30 @@ def checkhost():
         #screenres = LAPTOPRES
     return laptop
     
-def datadir():
-    host = gethostname().split('.')[0].lower()
+def setdatadir(dir):
+    DATADIR = dir
 
-    if host=='smash':
-        uname = "dmarkant"
-        return "/Users/%s/data" % uname
-        
-    elif host.count('compute')==1:
-        return "/scratch/dbm294/data"
-        
+
+def datadir():
+    if DATADIR!=None:
+        return DATADIR
     else:
-        uname = "doug"
-        return "/Users/%s/data" % uname
-        
+
+        host = gethostname().split('.')[0].lower()
+
+        if host=='smash':
+            uname = "dmarkant"
+            return "/Users/%s/data" % uname
+            
+        elif host.count('compute')==1:
+            return "/scratch/dbm294/data"
+            
+        else:
+            uname = "doug"
+            return "/Users/%s/data" % uname
+
+
+
 def copyclasshier(cls, dest):
     try:
         f = getfile(cls).rstrip('c')
