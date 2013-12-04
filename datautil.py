@@ -25,10 +25,13 @@ def checkhost():
     return laptop
     
 def setdatadir(dir):
+    global DATADIR
+    print 'setting data directory to %s' % dir
     DATADIR = dir
 
 
 def datadir():
+    global DATADIR
     if DATADIR!=None:
         return DATADIR
     else:
