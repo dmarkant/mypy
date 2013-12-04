@@ -2,15 +2,13 @@
 """
 Some general functions for loading data from Battleship experiment
 
-this is a change
-
 September, 2011
 """
 import os
 from mypy.datautil import datadir
 from numpy import *
 
-BASEDIR = "%s/exp/battleship" % datadir()
+BASEDIR = "%s/exp/battleship-v0" % datadir()
 
 TRIALTYPE_FN = "%s/trialtype.csv" % BASEDIR
 

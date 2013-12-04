@@ -4,7 +4,7 @@ import sys, multiprocessing
 General-purpose interaction with multiprocessing library
 
 """
-
+#jobdict = {}
 
 def workerfunc(targetfunc, jobqueue):
     """Generic worker function that will get passed to 
@@ -19,9 +19,11 @@ def workerfunc(targetfunc, jobqueue):
         if next==None: break   # if hit a None, end this process
         else:
             ind, j = next
+            print j
             try:
                 r = targetfunc(j)       # evaluate the function
             except:
+                print 'prob bob'
                 r = sys.exc_info()[0]   # catch any error
             
             jobdict[ind] = r     # store the result
@@ -83,8 +85,10 @@ def farmtest():
             jobs.append([i,j])
     r = farm(targetfunc=f, jobs=jobs, num_workers=2)
 
+    print "result: ", r
+
     # incompleted jobs
-    print catch_incomplete_jobs(r)
+    print "incomplete: ", catch_incomplete_jobs(r)
 
 
 
