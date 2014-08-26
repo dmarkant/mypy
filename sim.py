@@ -12,6 +12,7 @@ from datetime import datetime
 from multiprocessing import Pool
 from copy import copy
 from scipy.optimize import fmin, fmin_bfgs
+from scipy.optimize import minimize
 from numpy import around
 import sqlite3
 
@@ -355,8 +356,7 @@ class Sim:
                 "runindex":run
                }
 
-        [f, fopt, iter, funcalls, warnflag] = fmin( model.opt, init, args=[args], xtol=.05, ftol=.01, maxiter=100, full_output=1 )
-
+        [f, fopt, iter, funcalls, warnflag] = fmin(model.opt, init, (args,), xtol=.05, ftol=.01, maxiter=100, full_output=1)
         #[f, fopt, iter, funcalls, warnflag] = fmin_bfgs( model.opt, init, args=[args], epsilon=.01, maxiter=100, full_output=1 )
         
         print "| %s iterations" % iter
