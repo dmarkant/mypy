@@ -364,6 +364,7 @@ class Sim:
         e_opt = model.opt(f, args)
         self.outputfit( model, init, f, fopt, iter, run, e_opt )
 
+
     def output(self, data, rind=None):
         if rind is None:
             f = "%s/output.dat" % self.outdir
