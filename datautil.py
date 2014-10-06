@@ -12,7 +12,7 @@ Generic functions for working with data
 DATADIR = None
 
 ##########################################
-# Sys and file management 
+# Sys and file management
 ##########################################
 def checkhost():
     host = gethostname().split('.')[0].lower()
@@ -23,7 +23,7 @@ def checkhost():
         laptop = True
         #screenres = LAPTOPRES
     return laptop
-    
+
 def setdatadir(dir):
     global DATADIR
     print 'setting data directory to %s' % dir
@@ -41,10 +41,13 @@ def datadir():
         if host=='smash':
             uname = "dmarkant"
             return "/Users/%s/data" % uname
-            
+
         elif host.count('compute')==1:
             return "/scratch/dbm294/data"
-            
+
+        elif host.count('ARC')==1:
+            return "/Users/markant/data"
+
         else:
             uname = "doug"
             return "/Users/%s/data" % uname
@@ -79,7 +82,7 @@ def simplebackup(filename):
         print "datafile exists... backing up to "+backup
         os.rename(filename, backup)
     return
-    
+
 
 ##########################################
 # Frequent operations on data
@@ -172,7 +175,7 @@ def topairs(n, ncells):
 # Logging and communiques
 ##########################################
 def sendemail(message, subject, address):
-   command = "echo \"" 
+   command = "echo \""
    + message + "\" | mail -s \"" + subject + "\" " + address
    print command
    os.system(command)
