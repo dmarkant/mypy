@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pandas as pd
 
@@ -16,8 +17,7 @@ GAMBLES_STUDY_1 = [[np.array([[3,   1.], [0., 0.]]),   # 0 1
                     np.array([[32,.025], [0., .975]])] # 0 0
                     ]
 
-
-pth = "/Users/doug/code/SamplingDynamics/data/Hau2008/"
+pth = os.path.dirname(__file__) + "/"
 
 
 files_sampling = ["Hau08_s1.sampling_117.0.txt",
@@ -45,6 +45,17 @@ def choices(study, gid):
     c = df_choices[df_choices['problem']==(gid+1)].sort('subject')['choice'].values
     return np.abs(c - 1)
 
+
+def get_subj_data(study, sid, gid):
+    df_samples, df_choices = load_study(study)    
+    sdata = df_samples[(df_samples['subject']==sid) & (df_samples['problem']==(gid+1))]
+    sampledata = sdata[['option', 'outcome']].values
+
+    choicedata = df_choices[(df_choices['subject']==sid) & (df_choices['problem']==(gid+1))]
+    choice = choicedata['choice'].values[0]
+
+    return sampledata, choice
+    
 
 def get_options(study, gid):
 
