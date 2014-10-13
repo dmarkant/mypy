@@ -1,0 +1,62 @@
+** Gamble structure **
+
+gid: 			unique id for gamble (e.g., ‘S1G1’)
+domain: 		‘gain’ or ‘loss’
+
+pairtype:		‘HH-LL’ or ‘HL-LH’
+			If ‘HH-LL’, the H option has high variance, L option 
+			has low variance (‘hard’ problem); if ‘HL-LH’, H
+			option has low variance, L option has H variance (‘easy’
+			problem)
+
+ev_diff: 		EV(H) - EV(L)
+
+L_id, H_id: 		unique ids for set of outcomes, which occur multiple
+			times in different gambles —- but note that every
+			gamble had unique outcome probabilities
+			
+L_x1, L_x2, L_x3: 	outcomes for L option
+L_p1, L_p2, L_p3: 	outcome probabilities for L option
+L_ev: 			EV(L)
+L_ev_var: 		Var(L)
+
+H_x1, H_x2, H_x3: 	outcomes for H option
+H_p1, H_p2, H_p3:	outcome probabilities for H option
+H_ev:			EV(H)
+H_ev_var:		Var(H)
+
+
+** Dependent measures **
+
+Proportion choosing the H option
+prop_H_all		all participants
+prop_H_all_old		all participants in ‘old’ group
+prop_H_all_yng		all participants in ‘young’ group
+prop_H_g1		group 1 (high switch rate)
+prop_H_g1_old		group 1 and ‘old’
+prop_H_g1_yng		group 1 and ‘youg’
+prop_H_g2		group 2 (low switch rate)
+prop_H_g2_old		group 2 and ‘old’
+prop_H_g2_yng		group 2 and ‘young’
+
+Average sample size
+ss_all			(same scheme as above)
+ss_all_old
+ss_all_yng
+ss_g1
+ss_g1_old
+ss_g1_yng
+ss_g2
+ss_g2_old
+ss_g2_yng
+
+Average switching frequency
+sf_all			(same scheme as above)
+sf_all_old
+sf_all_yng
+sf_g1
+sf_g1_old
+sf_g1_yng
+sf_g2
+sf_g2_old
+sf_g2_yng
