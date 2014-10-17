@@ -18,7 +18,7 @@ GAMBLES_STUDY_1 = [[np.array([[3,   1.], [0., 0.]]),   # 0 1
                     ]
 
 pth = os.path.dirname(__file__) + "/"
-
+if pth=='/': pth='./'
 
 files_sampling = ["Hau08_s1.sampling_117.0.txt",
                   "Hau08_s2.sampling_118.0.txt",
@@ -55,10 +55,39 @@ def get_subj_data(study, sid, gid):
     choice = choicedata['choice'].values[0]
 
     return sampledata, choice
-    
+
+
+def sampledata_by_subject(study=1):
+    """
+    Return grouped list of data, where each group is an individual subject
+    """
+    df_samples, df_choices = load_study(study)
+    SUBJ = df_samples['subject'].unique()
+
+    sampledata = {}
+    for s in SUBJ:
+        sampledata[s] = []
+        gset = df_samples[df_samples['subject']==s]['problem'].unique()
+        for gid in gset:
+            df_game = df_samples[(df_samples['subject']==s) & (df_samples['problem']==gid)]
+            samples = np.array(df_game['option'].values)
+            outcomes = np.array(df_game['outcome'].values)
+            choice = df_choices[(df_choices['subject']==s) & (df_choices['problem']==gid)]['choice'].values[0]
+
+            sampledata[s].append({'sid': s,
+                                  'gid': gid,
+                                  'sampledata': samples,
+                                  'outcomes': outcomes,
+                                  'choice': choice})
+    return sampledata
+
 
 def get_options(study, gid):
 
     if study==1 or study==2:
 
         return GAMBLES_STUDY_1[gid]
+
+if __name__=='__main__':
+
+    print sampledata_by_subject(2)
