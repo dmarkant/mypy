@@ -16,6 +16,21 @@ GAMBLES_STUDY_1 = [[np.array([[3,   1.], [0., 0.]]),   # 0 1
                    [np.array([[3,  .25], [0., .75]]),  # 1 1
                     np.array([[32,.025], [0., .975]])] # 0 0
                     ]
+"""
+GAMBLES_STUDY_1 = [[np.array([[4,   .8], [0., .2]]),
+                    np.array([[3,   1.], [0., 0.]])],   # 0 1
+                   [np.array([[4,   .2], [0., .8]]),  # 0 0
+                    np.array([[3,  .25], [0., .75]])],  # 1 1
+                   [np.array([[-3,  1.], [0., 0]]),   # 0 0
+                    np.array([[-32, .1], [0., .9]])],   # 1 1
+                   [np.array([[-3,  1.], [0., 0]]),   # 0 0
+                    np.array([[-4,  .8], [0., .2]])],   # 1 1
+                   [np.array([[32,  .1], [0., 0.9]]), # 0 0
+                    np.array([[3,   1.], [0., 0]])],    # 1 1
+                   [np.array([[32,.025], [0., .975]]) # 0 0
+                    np.array([[3,  .25], [0., .75]])]]
+"""
+
 
 pth = os.path.dirname(__file__) + "/"
 if pth=='/': pth='./'
@@ -35,6 +50,11 @@ def load_study(study):
     return df_samples, df_choices
 
 
+def subjects(study):
+    df_samples, df_choices = load_study(study)
+    return df_samples['subject'].unique()
+
+
 def samplesize(study, gid):
     df_samples, df_choices = load_study(study)
     return df_samples[df_samples['problem']==(gid+1)].sort('subject').groupby('subject').apply(lambda x: len(x)).values
@@ -47,14 +67,22 @@ def choices(study, gid):
 
 
 def get_subj_data(study, sid, gid):
-    df_samples, df_choices = load_study(study)    
+    df_samples, df_choices = load_study(study)
     sdata = df_samples[(df_samples['subject']==sid) & (df_samples['problem']==(gid+1))]
-    sampledata = sdata[['option', 'outcome']].values
+    sampledata = np.abs(sdata[['option', 'outcome']].values - 1)
 
     choicedata = df_choices[(df_choices['subject']==sid) & (df_choices['problem']==(gid+1))]
-    choice = choicedata['choice'].values[0]
+    if len(choicedata) > 0:
+        choice = np.abs(choicedata['choice'].values[0] - 1)
+    else:
+        choice = np.nan
 
-    return sampledata, choice
+    return {'sid': sid,
+            'gid': gid,
+            'options': GAMBLES_STUDY_1[gid],
+            'samples': sampledata[:,0],
+            'outcomes': sampledata[:,1],
+            'choice': choice}
 
 
 def sampledata_by_subject(study=1):
@@ -70,13 +98,14 @@ def sampledata_by_subject(study=1):
         gset = df_samples[df_samples['subject']==s]['problem'].unique()
         for gid in gset:
             df_game = df_samples[(df_samples['subject']==s) & (df_samples['problem']==gid)]
-            samples = np.array(df_game['option'].values)
+            samples = np.abs(np.array(df_game['option'].values) - 1)
             outcomes = np.array(df_game['outcome'].values)
-            choice = df_choices[(df_choices['subject']==s) & (df_choices['problem']==gid)]['choice'].values[0]
+            choice = np.abs(df_choices[(df_choices['subject']==s) & (df_choices['problem']==gid)]['choice'].values[0] - 1)
 
             sampledata[s].append({'sid': s,
                                   'gid': gid,
-                                  'sampledata': samples,
+                                  'options': GAMBLES_STUDY_1[gid-1],
+                                  'samples': samples,
                                   'outcomes': outcomes,
                                   'choice': choice})
     return sampledata
