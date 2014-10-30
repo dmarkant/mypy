@@ -2,8 +2,13 @@ import os
 import numpy as np
 import pandas as pd
 
+def subjects():
+    data = load_data()
+    return data['partid'].unique()
+
+
 def streak_lengths(samples):
-    
+
     lengths = []
     current_length = 0
     for trial, option in enumerate(samples):
@@ -33,7 +38,7 @@ def load_data():
     df['session'] = df['gamble_lab'].apply(session_from_label)
     df['game'] = df['gamble_lab'].apply(game_from_label)
     df = df[df['session'] < 22] # restrict to first 21 sessions
-    df = df.sort(['partid', 'session', 'gamble_ind', 'sample_ind'])    
+    df = df.sort(['partid', 'session', 'gamble_ind', 'sample_ind'])
     return df
 
 
