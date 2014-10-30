@@ -2,9 +2,39 @@ import os
 import numpy as np
 import pandas as pd
 
+def streak_lengths(samples):
+    
+    lengths = []
+    current_length = 0
+    for trial, option in enumerate(samples):
+
+        if trial==0:
+            current_length = 1
+        else:
+            if option == samples[trial - 1]:
+                current_length += 1
+            else:
+                lengths.append(current_length)
+                current_length = 1
+    lengths.append(current_length)
+    return np.array(lengths)
+
+
+def session_from_label(label):
+    return int(label.lstrip('S').split('G')[0])
+
+
+def game_from_label(label):
+    return int(label.lstrip('S').split('G')[1])
+
 
 def load_data():
-    return pd.read_csv('dfe.csv')
+    df = pd.read_csv('dfe.csv')
+    df['session'] = df['gamble_lab'].apply(session_from_label)
+    df['game'] = df['gamble_lab'].apply(game_from_label)
+    df = df[df['session'] < 22] # restrict to first 21 sessions
+    df = df.sort(['partid', 'session', 'gamble_ind', 'sample_ind'])    
+    return df
 
 
 def load_data_by_game():
@@ -16,6 +46,12 @@ def gambles():
     gambles = data[data['partid']==1]
     gambles_srt = gambles.sort(['domain', 'pairtype', 'session'])
     return gambles_srt
+
+
+def streak_lengths_by_subject(sid):
+    df = load_data()
+    return df[(df['partid']==sid)].groupby('gamble_lab').apply(lambda gdf: streak_lengths(gdf['sample_opt'].values))
+
 
 
 def sampledata_by_subject():

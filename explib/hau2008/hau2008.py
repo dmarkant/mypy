@@ -3,6 +3,9 @@ import numpy as np
 import pandas as pd
 
 
+REWARD_PER_POINT = [.05, .50]
+
+
 GAMBLES_STUDY_1 = [[np.array([[3,   1.], [0., 0.]]),   # 0 1
                     np.array([[4,   .8], [0., .2]])],  # 1 0
                    [np.array([[3,  .25], [0., .75]]),  # 1 1
