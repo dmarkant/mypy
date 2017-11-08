@@ -4,10 +4,9 @@ import sys, multiprocessing
 General-purpose interaction with multiprocessing library
 
 """
-#jobdict = {}
 
 def workerfunc(targetfunc, jobqueue):
-    """Generic worker function that will get passed to 
+    """Generic worker function that will get passed to
     individual processes
 
     targetfunc:     function to run
@@ -23,9 +22,9 @@ def workerfunc(targetfunc, jobqueue):
             try:
                 r = targetfunc(j)       # evaluate the function
             except:
-                print 'prob bob'
+                print 'problem'
                 r = sys.exc_info()[0]   # catch any error
-            
+
             jobdict[ind] = r     # store the result
     return
 
@@ -50,7 +49,7 @@ def farm(targetfunc, jobs=[], num_workers=1):
     q = multiprocessing.Queue()
     for i in range(len(jobs)):      q.put( [i, jobs[i]] )
     for _ in range(num_workers):    q.put( None ) # sentinel to stop each process
-   
+
     workers = []
     for i in range(num_workers):
         tmp = multiprocessing.Process(target=workerfunc, args=[targetfunc, q])
@@ -76,9 +75,9 @@ def catch_incomplete_jobs(d):
 def farmtest():
     global f, results
     print "testing farming.py"
- 
+
     def f(x): return sum(x)
- 
+
     jobs = []
     for i in range(100):
         for j in range(100):

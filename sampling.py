@@ -15,7 +15,7 @@ def entropy(dist):
 
 def margin(l):
     t = float(sum(l))
-    l = [el+1e-10 for el in l]  # avoid log(0)    
+    l = [el+1e-10 for el in l]  # avoid log(0)
     l = sort([el/t for el in l])
     return 1.0-(l[-1]-l[-2])
 
@@ -31,12 +31,18 @@ def pairwisemargin(l):
     pwlm = map(lambda pair: sum(pair)*(1-(pair[1]-pair[0])), [sort([l[0]/t, l[1]/t]), sort([l[0]/t, l[2]/t]), sort([l[1]/t, l[2]/t])])
     return pwlm
 
+
+def sample_from_discrete(cp):
+    r = random()
+    return where(r < cumsum(cp))[0][0]
+
+
 def probchoice(V, d, obs=[]):
     """Make probabiilistic choice based on array of sampling values V and determinism d
-    
+
        Returns index of choice (not actual sample, which is tied to a sampling set)
     """
-    
+
     #d = 0.01
     #obs = []
     #V = array([0., 0., 0.2, 0.2, 0.2, 0.4])
@@ -49,10 +55,10 @@ def probchoice(V, d, obs=[]):
 
     # set the value of any prior observations to zero
     for i in range(len(obs)): top[obs[i][0]] = 0.
-   
+
     bottom = sum(top)
     cp = [t/bottom for t in top]
-    
+
     r = random()
     #print r
     #print cumsum(cp)

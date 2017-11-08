@@ -1,5 +1,9 @@
+import os
 import json
 import numpy as np
+
+
+CHOICE_PROP = [0.88, 0.44, 0.28, 0.56, 0.20, 0.12]
 
 
 GAMBLES = [[np.array([[3, 1.], [0., 0.]]),
@@ -16,8 +20,12 @@ GAMBLES = [[np.array([[3, 1.], [0., 0.]]),
             np.array([[32, .025], [0., .975]])]
            ]
 
-pth = 'hertwig_2004.txt'
-pth_json = 'hertwig_2004.json'
+bpth = os.path.dirname(__file__) + "/"
+if bpth=='/': bpth='./'
+
+
+pth = bpth + 'hertwig_2004.txt'
+pth_json = bpth + 'hertwig_2004.json'
 
 def parse_to_json():
 

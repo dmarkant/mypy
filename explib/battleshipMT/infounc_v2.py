@@ -2,7 +2,10 @@ import os
 import json
 from mypy.datautil import datadir
 
-SUBJPATH = '%s/exp-mturk/infounc-v2' % datadir()
+#SUBJPATH = '%s/exp-mturk/infounc-v2' % datadir()
+
+SUBJPATH = '/Users/markant/data/exp-mturk/infounc-v2'
+
 
 SUBJECTS = [0, 1, 2, 3, 4]
 
@@ -57,13 +60,19 @@ class Subject:
             if len(samples)>0:
                 played.append(g)
 
-        return played 
+        return played
 
-        
+
 
 if __name__ == '__main__':
 
-    s = Subject(0)
-    for game in range(30):
-        print s.samples(game=game)
-        print s.gameboard(game=game)
+
+
+    for sid in range(35):
+
+        try:
+            s = Subject(sid)
+            ss = [len(s.samples(game=game)) for game in range(30)]
+            print sid, min(ss)
+        except:
+            pass

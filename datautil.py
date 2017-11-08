@@ -5,6 +5,9 @@ from inspect import getfile
 from socket import gethostname
 from numpy import array, cumsum
 from random import random
+from sqlalchemy import *
+import numpy as np
+import pandas as pd
 """
 Generic functions for working with data
 """
@@ -68,7 +71,6 @@ def copyclasshier(cls, dest):
 
 def checkpath(dir):
     head, tail = os.path.split(dir)
-
     if head!="" and head!="~" and not os.path.exists(head): checkpath(head)
     if not os.path.exists(dir): os.mkdir(dir)
 
@@ -82,6 +84,29 @@ def simplebackup(filename):
         print "datafile exists... backing up to "+backup
         os.rename(filename, backup)
     return
+
+
+
+##########################################
+# Data from mysql database
+##########################################
+def download_data_from_mysqldb(dburl, tablename, condition=None):
+    versionname = ''
+    engine = create_engine(dburl)
+    metadata = MetaData()
+    metadata.bind = engine
+    table = Table(tablename, metadata, autoload=True)
+
+    # want to add a conditional clause
+    s = table.select()
+
+    rs = s.execute()
+    data = []
+    for row in rs:
+        data.append(row)
+
+    df = pd.DataFrame(data, columns=table.columns.keys())
+    return df
 
 
 ##########################################

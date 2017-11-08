@@ -4,7 +4,7 @@ General-purpose script for running simulations.
 
 September 2011
 """
-import os, gzip, sys
+import os, gzip, sys, pickle
 from random import random
 from socket import gethostname
 from datautil import checkpath, copyclasshier
@@ -20,11 +20,11 @@ HOST = gethostname()
 
 # status ids
 INIT = 0
-RUNNING = 1 
+RUNNING = 1
 COMPLETE = 2
 STATUS_STR = ["intializing", "running", "complete"]
 
-       
+
 def data_id_str(ids):
     id = ""
     for pair in ids:
@@ -41,10 +41,10 @@ def sim_id_str(name, fixed, par):
         for k in keys:
             id += "%s,"%k
         id = id.rstrip(",")+"|"
-                
+
     if fixed!=None:
         keys = fixed.keys()
-        keys.sort()        
+        keys.sort()
         for k in keys:
             id += "%s=%s," % (k, fixed[k])
         id = id.rstrip(",")
@@ -73,7 +73,32 @@ def read_sim_result(id, file):
 
     return fit
 
-def write_sim_result(name="", par=None, fixed=None, result=None, col=None, file="results.dat"):  
+
+def pickle_sim_result(name="", result_id='output', par=None, fixed=None, result=None, outdir='.'):
+    sim_id = sim_id_str(name, fixed, par)
+    outdir = '%s/%s' % (outdir, sim_id)
+    checkpath(outdir)
+
+    # write result to file
+    with open('%s/%s.pkl' % (outdir, result_id), 'w') as fp:
+        pickle.dump(result, fp)
+
+
+def unpickle_sim_result(name="", result_id='output', par=None, fixed=None, outdir='.', quiet=True):
+    sim_id = sim_id_str(name, fixed, par)
+    pth = '%s/%s/%s.pkl' % (outdir, sim_id, result_id)
+
+    if not os.path.exists(pth):
+        if not quiet: print 'No pickle found at %s' % pth
+        return None
+    else:
+        if not quiet: print 'Loading pickle at %s' % pth
+        with open(pth, 'r') as fp:
+            result = pickle.load(fp)
+        return result
+
+
+def write_sim_result(name="", par=None, fixed=None, result=None, col=None, file="results.dat"):
 
     id = sim_id_str(name, par, fixed)
 
@@ -149,7 +174,7 @@ def outside_bounds(b, par):
             bnd = bounds[index]
             if value < bnd[0] or value > bnd[1]:
                 out += 1
-            
+
         if out > 0:
             return True
         else:
@@ -205,7 +230,7 @@ class SimDB:
         self.fields = args.get('fields',None)
 
     def get_connection(self): return sqlite3.connect(self.file)
-    
+
     def add_table(self, tablename=None, fields=None):
 
         q = "CREATE TABLE %s ( sim_id int PRIMARY_KEY NOT_NULL AUTO_INCREMENT" % tablename
@@ -216,7 +241,7 @@ class SimDB:
         with self.get_connection() as conn:
             r = conn.cursor().execute(q)
             conn.commit()
-    
+
     def add_column(self, tablename=None, colname=None, datatype=None):
 
         q = "ALTER TABLE %s ADD %s %s" % (tablename, colname, datatype)
@@ -275,7 +300,7 @@ class Sim:
         self.save = args.get('save',True)           # whether to save result
         self.compress = args.get('compress',True)   # whether to gzip output
 
-        self.nruns = args.get('nruns',1) 
+        self.nruns = args.get('nruns',1)
         self.run_indices = args.get('run_indices',range(self.nruns))
 
         self.quiet = args.get('quiet',False)
@@ -303,19 +328,19 @@ class Sim:
         # if there are no free parameters to fit, then just call the model
         if self.par=={}:
             if not self.quiet: print "No free parameters, running model for %s runs..." % self.nruns
-            
+
             for r in range(self.nruns):
 
                 rind = self.run_indices[r]
 
                 if "llh" in dir(m):
-                    # if model has llh defined, run the model and compute the log-likelihood 
+                    # if model has llh defined, run the model and compute the log-likelihood
                     # given the fixed parameters
                     m.llh(None, {"fixed":self.fixed, "dir":self.outdir, "runindex":rind}, cache=False)
                 else:
                     # otherwise, just run the model without computing likelihood
-                    m(self.fixed, output=False)        
-                
+                    m(self.fixed, output=False)
+
                 sys.stdout.flush()
                 if self.save: self.output( m.output(), rind=rind) # write model output to file
 
@@ -358,7 +383,7 @@ class Sim:
 
         [f, fopt, iter, funcalls, warnflag] = fmin(model.opt, init, (args,), xtol=.05, ftol=.01, maxiter=100, full_output=1)
         #[f, fopt, iter, funcalls, warnflag] = fmin_bfgs( model.opt, init, args=[args], epsilon=.01, maxiter=100, full_output=1 )
-        
+
         print "| %s iterations" % iter
 
         e_opt = model.opt(f, args)
@@ -372,16 +397,16 @@ class Sim:
             f = "%s/output-run%s.dat" % (self.outdir, rind)
 
         #if not self.quiet: print "\twriting result to %s" % self.outdir
-        if self.compress:   
+        if self.compress:
             fp = gzip.open("%s.gz" % f, "w")
-        else:               
+        else:
             fp = open(f, "w")
         fp.writelines(data)
         fp.flush()
         fp.close()
 
     def outputfit(self, model, init, f, fopt, iter, run, llh):
-        
+
         if run==0:
             fp = open("%s/fit_output.dat" % self.outdir, "w")
             s = "%s\n" % self.id_str
@@ -416,13 +441,13 @@ class Sim:
 
         # any additional output from model given best fit parameters
         s += model.output(outputprefix="%s " % run)
-       
+
 
         fp.writelines(s)
         fp.close()
 
     def log(self, status=0):
-        
+
         info = (datetime.now(),
                 HOST,
                 self.id_str,
