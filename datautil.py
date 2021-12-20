@@ -29,7 +29,7 @@ def checkhost():
 
 def setdatadir(dir):
     global DATADIR
-    print 'setting data directory to %s' % dir
+    print('setting data directory to %s' % dir)
     DATADIR = dir
 
 
@@ -66,7 +66,7 @@ def copyclasshier(cls, dest):
             copyclasshier(bcls, dest)
         return 1
     except:
-        print "failed to copy class hierarchy"
+        print("failed to copy class hierarchy")
         return 0
 
 def checkpath(dir):
@@ -81,7 +81,7 @@ def simplebackup(filename):
         while os.path.exists(filename+".bak%s" % i):
             i += 1
         backup = filename+".bak%s" % i
-        print "datafile exists... backing up to "+backup
+        print("datafile exists... backing up to "+backup)
         os.rename(filename, backup)
     return
 
@@ -90,7 +90,7 @@ def simplebackup(filename):
 ##########################################
 # Data from mysql database
 ##########################################
-def download_data_from_mysqldb(dburl, tablename, condition=None):
+def download_data_from_mysqldb(dburl, tablename, codeversion=None):
     versionname = ''
     engine = create_engine(dburl)
     metadata = MetaData()
@@ -98,7 +98,10 @@ def download_data_from_mysqldb(dburl, tablename, condition=None):
     table = Table(tablename, metadata, autoload=True)
 
     # want to add a conditional clause
-    s = table.select()
+    if codeversion is None:
+        s = table.select()
+    else:
+        s = table.select().where(table.c.codeversion == codeversion)
 
     rs = s.execute()
     data = []
@@ -202,9 +205,9 @@ def topairs(n, ncells):
 def sendemail(message, subject, address):
    command = "echo \""
    + message + "\" | mail -s \"" + subject + "\" " + address
-   print command
+   print(command)
    os.system(command)
 
 def runcount(runindex, totalruns):
     inter = range(0,totalruns, totalruns/10)
-    if runindex in inter: print "%s" % (int((100./float(totalruns))*runindex)), "%"#########################
+    if runindex in inter: print("%s" % (int((100./float(totalruns))*runindex)), "%")#########################
